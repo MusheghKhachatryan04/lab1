@@ -1,1 +1,35 @@
+name: Run c++ Program
 
+on:
+   workflow_dispatch:
+     inputs:
+       username:
+         description: "Enter user name"
+         required: true
+         type: string
+
+         number:
+           description:"Enter a number"
+           required: true
+           type: number
+
+        runFlag:
+          description: "Enable flag"
+          required: true
+          type: boolean
+          default: false
+  jobs:
+      build-and-run:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout repo
+            uses: actions/checkout@v4
+
+          - name: Compile C++ files
+            run: |
+                g++ a.cpp b.cpp c.cpp -o program
+
+              -name: Run program with inputs
+              run: |
+                 ./program "${{ inputs.username }}" "${{ inputs.number }}" "${{ inputs.runFlag }}"
