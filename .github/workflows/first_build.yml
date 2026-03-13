@@ -1,36 +1,38 @@
-name: Run C++ Program
+name: Create Tag and Release
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      username:
-        description: "Enter user name"
-        required: true
-        type: string
-
-      number:
-        description: "Enter a number"
-        required: true
-        type: number
-
-      runFlag:
-        description: "Enable flag"
-        required: true
-        type: boolean
-        default: false
 
 jobs:
-  build-and-run:
+  release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Compile C++ files
+      - name: Generate tag
+        id: tag
         run: |
-          g++ a.cpp b.cpp c.cpp -o program
+          TAG=v1.$(date +'%Y%m%d%H%M%S')
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Run program with inputs
+      - name: Create Git tag
         run: |
-          ./program "${{ inputs.username }}" "${{ inputs.number }}" "${{ inputs.runFlag }}"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ steps.tag.outputs.tag }}
+          git push origin ${{ steps.tag.outputs.tag }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Release ${{ steps.tag.outputs.tag }}
+          body: |
+            Automated release created by GitHub Actions.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
