@@ -1,10 +1,15 @@
 name: Create Tag and Release
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   release:
@@ -14,7 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0
+          fetch-depth: 0
 
       - name: Generate tag
         id: tag
@@ -34,7 +39,5 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: Release ${{ steps.tag.outputs.tag }}
-          body: |
-            Automated release created by GitHub Actions.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
