@@ -12,9 +12,23 @@ permissions:
   contents: write
 
 jobs:
+  build1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build 1
+        run: echo "Running build 1"
+
+  build2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build 2
+        run: echo "Running build 2"
+
   release:
     runs-on: ubuntu-latest
-
+    needs: [build1, build2]  # 👈 ждет оба job-а
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
